@@ -51,7 +51,7 @@ def encrypt_privmsg(word, word_eol, userdata):
 	ctx = xchat.get_context()
 	if (ctx.get_info('channel'), ctx.get_info('server')) in USERS:
 		message = word_eol[0]
-		xchat.command('PRIVMSG %s :%s' % (ctx.get_info('channel'), encrypt(message)))
+		xchat.command('PRIVMSG %s :%s' % (ctx.get_info('channel'), "ENC:" + encrypt(message)))
 		xchat.emit_print('Your Message', xchat.get_info('nick'), message)
 		return xchat.EAT_XCHAT
 	return xchat.EAT_NONE
@@ -60,13 +60,13 @@ def decrypt_print(word, word_eol, userdata):
 	global PROCESSING
 	if PROCESSING:
 		return xchat.EAT_NONE
-	speaker,message = word[0],word[1]
+	sender,message = word[0],word[1]
 	ctx = xchat.get_context()
-	if (ctx.get_info('channel'), ctx.get_info('server')) in USERS:
+	if message[:4] == "ENC:":
 		try:
-			plaintext = decrypt(message)
+			plaintext = decrypt(message[4:])
 			PROCESSING = True
-			ctx.emit_print('Private Message to Dialog', speaker, "\x0303" + plaintext)
+			ctx.emit_print('Private Message to Dialog', sender, "\x0303" + plaintext)
 			PROCESSING = False
 			return xchat.EAT_XCHAT
 		except Exception as e:
