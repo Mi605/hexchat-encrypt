@@ -2,19 +2,18 @@
 # -*- coding: utf-8 -*-
 import xchat
 import subprocess
-import base64
 import re
 
 __module_name__ = "xchat-encrypt" 
 __module_version__ = "1.0" 
-__module_description__ = "Xchat encryption" 
+__module_description__ = "XChat encryption" 
 
 PROCESSING = False
 PASSWORD = "PASS"
 USERS = set()
 
 def encrypt(plaintext):
-	process = subprocess.Popen(["openssl","enc","-aes-256-cbc","-e","-base64","-k",PASSWORD],
+	process = subprocess.Popen(["openssl","enc","-aes-256-cbc","-e","-a","-A","-k",PASSWORD],
 		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = process.communicate(plaintext)
       
@@ -24,14 +23,14 @@ def encrypt(plaintext):
 		return stderr
 
 def decrypt(cryptogram):
-	process = subprocess.Popen(["openssl","enc","-aes-256-cbc","-d","-k",PASSWORD],
+	process = subprocess.Popen(["openssl","enc","-aes-256-cbc","-d","-a","-A","-k",PASSWORD],
 		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = process.communicate(cryptogram)
 
 	if process.returncode == 0:  
 		return stdout
 	else:
-		return stderr
+		raise Exception(stderr)
 
 def users(word, word_eol, userdata):
 	print(USERS)
@@ -64,11 +63,14 @@ def decrypt_print(word, word_eol, userdata):
 	speaker,message = word[0],word[1]
 	ctx = xchat.get_context()
 	if (ctx.get_info('channel'), ctx.get_info('server')) in USERS:
-		plaintext = decrypt(base64.b64decode(message))
-		PROCESSING = True
-		ctx.emit_print('Private Message to Dialog', speaker, message + " -> " + plaintext)
-		PROCESSING = False
-		return xchat.EAT_XCHAT
+		try:
+			plaintext = decrypt(message)
+			PROCESSING = True
+			ctx.emit_print('Private Message to Dialog', speaker, "\x0303" + plaintext)
+			PROCESSING = False
+			return xchat.EAT_XCHAT
+		except Exception as e:
+			return xchat.EAT_NONE
 	return xchat.EAT_NONE
 
 xchat.hook_command('', encrypt_privmsg)
