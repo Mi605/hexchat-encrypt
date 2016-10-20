@@ -5,9 +5,9 @@ import subprocess
 import base64
 import re
 
-__module_name__ = "helloworld" 
+__module_name__ = "xchat-encrypt" 
 __module_version__ = "1.0" 
-__module_description__ = "Python module example" 
+__module_description__ = "Xchat encryption" 
 
 PROCESSING = False
 PASSWORD = "PASS"
