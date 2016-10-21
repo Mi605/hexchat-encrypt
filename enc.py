@@ -10,8 +10,7 @@ __module_description__ = "XChat encryption"
 PROCESSING = False
 PASSWORD = "PASS"
 CHANNELS = set()
-COLORS = {	'GREEN': "\x0303",
-			'RED'  : "\x0304" 	}
+COLORS = { 'GREEN': "\x0303", 'RED'  : "\x0304"	}
 			
 def channelServer(ctx):
 	return (ctx.get_info('channel'), ctx.get_info('server'))
