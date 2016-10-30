@@ -2,28 +2,32 @@
 # -*- coding: utf-8 -*-
 import xchat
 import subprocess
+import os
 
 __module_name__ = "xchat-encrypt" 
 __module_version__ = "1.0" 
 __module_description__ = "XChat symmetric encryption" 
 
 PROCESSING = False
-KEYFILE = ""
+KEYFILE = None
 CHANNELS = set()
-COLORS = { 'GREEN': "\x0303", 'RED': "\x0304"	}
+COLORS = { 'GREEN': "\x0303", 
+		   'RED': "\x0304"	}
 			
 def channelServer(ctx):
 	return (ctx.get_info('channel'), ctx.get_info('server'))
 
 def encrypt(plaintext):
-	process = subprocess.Popen(["openssl","enc","-aes-256-cbc","-e","-a","-A","-pass","file:"+KEYFILE],
+	process = subprocess.Popen(
+		["openssl","enc","-aes-256-cbc","-e","-a","-A","-pass","file:"+KEYFILE],
 		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = process.communicate(plaintext)      
 	if process.returncode == 0: return stdout
 	raise Exception(stderr)
 
 def decrypt(cryptogram):
-	process = subprocess.Popen(["openssl","enc","-aes-256-cbc","-d","-a","-A","-pass","file:"+KEYFILE],
+	process = subprocess.Popen(
+		["openssl","enc","-aes-256-cbc","-d","-a","-A","-pass","file:"+KEYFILE],
 		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = process.communicate(cryptogram)
 	if process.returncode == 0: return stdout
@@ -34,8 +38,10 @@ def send(word, word_eol, userdata):
 	if channelServer(ctx) in CHANNELS:
 		message = word_eol[0]
 		try:
-			xchat.command('PRIVMSG %s :%s' % (ctx.get_info('channel'), "ENC:" + encrypt(message)))
-			xchat.emit_print('Your Message', xchat.get_info('nick'), message)
+			xchat.command('PRIVMSG %s :%s' % 
+				(ctx.get_info('channel'), "ENC:" + encrypt(message)))
+			xchat.emit_print('Your Message', 
+				xchat.get_info('nick'), message)
 			return xchat.EAT_XCHAT
 		except Exception as e:
 			ctx.prnt(COLORS['RED'] + "Could not encrypt!" + " " + str(e))
@@ -52,7 +58,8 @@ def receive(word, word_eol, userdata):
 		try:
 			plaintext = decrypt(message[4:])
 			PROCESSING = True
-			ctx.emit_print('Private Message to Dialog', sender, COLORS['GREEN'] + plaintext)
+			ctx.emit_print('Private Message to Dialog', 
+				sender, COLORS['GREEN'] + plaintext)
 			PROCESSING = False
 			return xchat.EAT_XCHAT
 		except Exception as e:
@@ -66,12 +73,17 @@ def info(ctx):
 	else:
 		ctx.prnt(COLORS['RED'] + 
 		"Outgoing encryption is disabled for this channel")
-	ctx.prnt("Keypath: " + KEYFILE)
+	ctx.prnt("Keypath: " + 
+		("No keyfile found" if KEYFILE is None else KEYFILE))
 	return xchat.EAT_ALL
 
 def enable(ctx):
-	CHANNELS.add(channelServer(ctx))
-	ctx.prnt(COLORS['GREEN'] + "Encryption enabled")
+	if KEYFILE is not None:
+		CHANNELS.add(channelServer(ctx))
+		ctx.prnt(COLORS['GREEN'] + "Encryption enabled")
+	else:
+		ctx.prnt(COLORS['RED'] + 
+			"Encryption could not be enabled because no keyfile exists.")
 	return xchat.EAT_ALL
 
 def disable(ctx):
@@ -89,15 +101,20 @@ def enc(word,word_eol,userdata):
 		disable(ctx)
 	elif arg == "info":
 		info(ctx)
-	elif arg == "key":
-		global KEYFILE
-		KEYFILE = word[2]
-		ctx.prnt(COLORS['GREEN'] + "Keyfile added: " + KEYFILE)
-	else:
-		ctx.prnt("Wrong argument")		
 	return xchat.EAT_ALL
+
+def loadKeyFile(path):
+	keypath = path + "/key.bin"
+	if os.path.isfile(keypath):
+		global KEYFILE
+		KEYFILE = keypath
+		print(COLORS['GREEN'] + "Key: " + keypath + " loaded!")
+	else: 
+		print(COLORS['RED'] + "No keyfile found in " + path)
+
 
 xchat.hook_command('', send)
 xchat.hook_command('enc',enc)
 xchat.hook_print('Private Message to Dialog', receive)
+loadKeyFile(xchat.get_info('xchatdir'))
 
