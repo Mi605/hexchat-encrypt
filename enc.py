@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# http://labix.org/xchat-python
+
 import xchat
 import subprocess
 import os
