@@ -17,8 +17,8 @@ COLORS = { 'GREEN': "\x0303", 'RED': "\x0304" }
 DEBUG = False
 MCHARSIZE = 330
 			
-def channelServer(ctx):
-	return (ctx.get_info('channel'), ctx.get_info('server'))
+def channelServer(ctxt):
+	return (ctxt.get_info('channel'), ctxt.get_info('server'))
 
 def encrypt(plaintext):
 	process = subprocess.Popen(
@@ -37,21 +37,21 @@ def decrypt(cryptogram):
 	raise Exception(stderr)
 		
 def send(word, word_eol, userdata):
-	ctx = hexchat.get_context()
-	if channelServer(ctx) in CHANNELS:
+	ctxt = hexchat.get_context()
+	if channelServer(ctxt) in CHANNELS:
 		message = word_eol[0]
 		try:
 			for x in range(0,len(message),MCHARSIZE): 
 				hexchat.command('PRIVMSG %s :%s' % 
-					(ctx.get_info('channel'), "HEXCHATENC:" 
+					(ctxt.get_info('channel'), "HEXCHATENC:" 
 						+ encrypt(message[x:x+MCHARSIZE])))
 			hexchat.emit_print('Your Message', 
 				hexchat.get_info('nick'), COLORS['GREEN'] + message)
 			return hexchat.EAT_HEXCHAT
 		except Exception as e:
-			ctx.prnt(COLORS['RED'] + 
+			ctxt.prnt(COLORS['RED'] + 
 				"Could not encrypt!")
-			if DEBUG: ctx.prnt(str(e))
+			if DEBUG: ctxt.prnt(str(e))
 			return hexchat.EAT_ALL
 	return hexchat.EAT_NONE
 
@@ -60,64 +60,64 @@ def receive(word, word_eol, userdata):
 	if PROCESSING:
 		return hexchat.EAT_NONE
 	sender,message = word[0],word[1]
-	ctx = hexchat.get_context()
+	ctxt = hexchat.get_context()
 	if message[:11] == "HEXCHATENC:":
 		try:
 			plaintext = decrypt(message[11:])
 			PROCESSING = True
-			ctx.emit_print('Private Message to Dialog', 
+			ctxt.emit_print('Private Message to Dialog', 
 				sender, COLORS['GREEN'] + plaintext)
 			PROCESSING = False
 			return hexchat.EAT_HEXCHAT
 		except Exception as e:
-			ctx.prnt(COLORS['RED'] + 
+			ctxt.prnt(COLORS['RED'] + 
 				"Could not decrypt!")
-			if DEBUG: ctx.prnt(str(e))
+			if DEBUG: ctxt.prnt(str(e))
 			return hexchat.EAT_NONE
 	return hexchat.EAT_NONE
 			
-def info(ctx):
-	if channelServer(ctx) in CHANNELS:
-		ctx.prnt(COLORS['GREEN'] + 
+def info(ctxt):
+	if channelServer(ctxt) in CHANNELS:
+		ctxt.prnt(COLORS['GREEN'] + 
 		"Outgoing encryption enabled for this channel")
 	else:
-		ctx.prnt(COLORS['RED'] + 
+		ctxt.prnt(COLORS['RED'] + 
 		"Outgoing encryption disabled for this channel")
 	return hexchat.EAT_ALL
 
-def enable(ctx):
-	CHANNELS.add(channelServer(ctx))
-	ctx.prnt(COLORS['GREEN'] + "Encryption enabled")
+def enable(ctxt):
+	CHANNELS.add(channelServer(ctxt))
+	ctxt.prnt(COLORS['GREEN'] + "Encryption enabled")
 	return hexchat.EAT_ALL
 
-def disable(ctx):
-	if channelServer(ctx) in CHANNELS:
-		CHANNELS.remove(channelServer(ctx))
-		ctx.prnt(COLORS['RED'] + "Encryption disabled")
+def disable(ctxt):
+	if channelServer(ctxt) in CHANNELS:
+		CHANNELS.remove(channelServer(ctxt))
+		ctxt.prnt(COLORS['RED'] + "Encryption disabled")
 	return hexchat.EAT_ALL
 
-def debug(ctx):
+def debug(ctxt):
 	global DEBUG
 	if DEBUG:
 		DEBUG = False
-		ctx.prnt(COLORS['GREEN'] + "Debug disabled")
+		ctxt.prnt(COLORS['GREEN'] + "Debug disabled")
 	else:
 		DEBUG = True
-		ctx.prnt(COLORS['GREEN'] + "Debug enabled")
+		ctxt.prnt(COLORS['GREEN'] + "Debug enabled")
 	return hexchat.EAT_ALL
 
 def enc(word,word_eol,userdata):
-	ctx = hexchat.get_context()
+	ctxt = hexchat.get_context()
 	if len(word) > 1:
 		arg = word[1]
 		if arg == "enable":
-			enable(ctx)
+			enable(ctxt)
 		elif arg == "disable":
-			disable(ctx)
+			disable(ctxt)
 		elif arg == "info":
-			info(ctx)
+			info(ctxt)
 		elif arg == "debug":
-			debug(ctx)
+			debug(ctxt)
 	return hexchat.EAT_ALL
 
 def init():
