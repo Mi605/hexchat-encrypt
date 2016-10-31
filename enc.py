@@ -74,10 +74,10 @@ def receive(word, word_eol, userdata):
 def info(ctx):
 	if channelServer(ctx) in CHANNELS:
 		ctx.prnt(COLORS['GREEN'] + 
-		"Outgoing encryption is enabled for this channel")
+		"Outgoing encryption enabled for this channel")
 	else:
 		ctx.prnt(COLORS['RED'] + 
-		"Outgoing encryption is disabled for this channel")
+		"Outgoing encryption disabled for this channel")
 	return xchat.EAT_ALL
 
 def enable(ctx):
