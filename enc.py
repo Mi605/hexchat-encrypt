@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# https://hehexchat.readthedocs.io/en/latest/script_python.html
+# https://hexchat.readthedocs.io/en/latest/script_python.html
 
 import hexchat
 import subprocess
@@ -98,7 +98,12 @@ def disable(ctx):
 
 def debug(ctx):
 	global DEBUG
-	DEBUG = DEBUG ^ True
+	if DEBUG:
+		DEBUG = False
+		ctx.prnt(COLORS['GREEN'] + "Debug disabled")
+	else:
+		DEBUG = True
+		ctx.prnt(COLORS['GREEN'] + "Debug enabled")
 	return hexchat.EAT_ALL
 
 def enc(word,word_eol,userdata):
