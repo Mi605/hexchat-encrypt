@@ -100,10 +100,10 @@ def debug(ctxt):
 	global DEBUG
 	if DEBUG:
 		DEBUG = False
-		ctxt.prnt(COLORS['GREEN'] + "Debug disabled")
+		ctxt.prnt("Debug disabled")
 	else:
 		DEBUG = True
-		ctxt.prnt(COLORS['GREEN'] + "Debug enabled")
+		ctxt.prnt("Debug enabled")
 	return hexchat.EAT_ALL
 
 def enc(word,word_eol,userdata):
