@@ -118,7 +118,9 @@ def enc(word,word_eol,userdata):
 			info(ctxt)
 		elif arg == "debug":
 			debug(ctxt)
-	return hexchat.EAT_ALL
+		else:
+			ctxt.prnt("Wrong argument")
+		return hexchat.EAT_ALL
 
 def init():
 	filepath = hexchat.get_info('configdir') + "/pass.key"
