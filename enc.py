@@ -12,7 +12,7 @@ __module_version__ = "1.0"
 __module_description__ = "hexchat symmetric encryption" 
 
 PROCESSING = False
-PASSFILE = None
+PASSFILE = "/home/user/pass.key"
 CHANNELS = set()
 DEBUG = False
 MCHARSIZE = 330
@@ -104,17 +104,18 @@ def info(ctxt):
 	ctxt.prnt("* Passfile: " + PASSFILE )
 	ctxt.prnt("* Debug enabled" if DEBUG else "* Debug disabled")
 	if channelServer(ctxt) in CHANNELS:
-		ctxt.prnt("* Outgoing encryption enabled")
+		ctxt.prnt("* Encryption enabled")
 	else:
-		ctxt.prnt("* Outgoing encryption disabled")
+		ctxt.prnt("* Encryption disabled")
 	return hexchat.EAT_ALL
 
+""" Print help summary """
 def help(ctxt):
 	ctxt.prnt(textBold("------------ Help ------------"))
-	ctxt.prnt(textBold("/enc enable   Enable outgoing encryption for current context"))
-	ctxt.prnt(textBold("/enc disable  Disable outgoing encryption for current context"))
-	ctxt.prnt(textBold("/enc debug    Toggle verbose error messages"))
-	ctxt.prnt(textBold("/enc info     Print status about debug/encryption"))
+	ctxt.prnt(textBold("/enc enable   - Enable encryption for current context"))
+	ctxt.prnt(textBold("/enc disable  - Disable encryption for current context"))
+	ctxt.prnt(textBold("/enc debug    - Toggle verbose error messages"))
+	ctxt.prnt(textBold("/enc info     - Print status about debug/encryption"))
 
 """ Enable outgoing encryption for current channel """
 def enable(ctxt):
@@ -137,15 +138,6 @@ def debug(ctxt):
 		if DEBUG else "Debug disabled")
 	return hexchat.EAT_ALL
 
-""" Try to read the config file (enc.conf) in ~/.config/hexchat"""
-def readConf(section,option):
-	confFilePath = hexchat.get_info('configdir') + '/enc.conf'
-	if not os.path.isfile(confFilePath): # No conf file
-		raise IOError(confFilePath) 
-	config = ConfigParser.ConfigParser()
-	config.read(confFilePath)
-	return config.get(section,option)
-
 def enc(word,word_eol,userdata):
 	ctxt = hexchat.get_context()
 	try:
@@ -167,18 +159,13 @@ def enc(word,word_eol,userdata):
 """ Initialization function """
 def init():
 	try:
-		filepath = readConf('PASSFILE','path')
-		if os.path.isfile(filepath):
-			global PASSFILE
-			PASSFILE = filepath
-			hexchat.prnt(textPos(PASSFILE + " loaded!"))
+		if os.path.isfile(PASSFILE):
+			hexchat.prnt(textPos(PASSFILE + " loaded! Decryption of incoming messages enabled."))
 			hexchat.hook_command('', send)
-			hexchat.hook_command('enc',enc)
+			hexchat.hook_command('enc', enc,help="For help use the command /enc help")
 			hexchat.hook_print('Private Message to Dialog', receive)	
 		else:
-			raise IOError(filepath)
-	except IOError as e:
-		hexchat.prnt(textNeg(str(e) + " could not be opened"))
+			hexchat.prnt(textNeg("Could not open passfile"))
 	except Exception as e:
 		hexchat.prnt(textNeg(str(e)))	
 
