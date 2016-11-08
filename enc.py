@@ -5,14 +5,13 @@
 import hexchat
 import subprocess
 import os
-import ConfigParser
 
 __module_name__ = "hexchat-encrypt" 
 __module_version__ = "1.0" 
 __module_description__ = "hexchat symmetric encryption" 
 
 PROCESSING = False
-PASSFILE = "/home/user/pass.key"
+PASSFILE = "/home/user/pass.key" # Path to key 
 CHANNELS = set()
 DEBUG = False
 MCHARSIZE = 330
@@ -156,7 +155,6 @@ def enc(word,word_eol,userdata):
 		help(ctxt)
 	return hexchat.EAT_ALL
 
-""" Initialization function """
 def init():
 	try:
 		if os.path.isfile(PASSFILE):
