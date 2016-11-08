@@ -139,6 +139,14 @@ def readConf(section,option):
 	config.read(confFilePath)
 	return config.get(section,option)
 
+def help(ctxt):
+	ctxt.prnt(textBold("------------ Help ------------"))
+	ctxt.prnt(textBold("/enc enable   Enable outgoing encryption for current context"))
+	ctxt.prnt(textBold("/enc disable  Disable outgoing encryption for current context"))
+	ctxt.prnt(textBold("/enc debug    Toggle verbose error messages"))
+	ctxt.prnt(textBold("/enc info     Print status about debug/encryption"))
+
+
 def enc(word,word_eol,userdata):
 	ctxt = hexchat.get_context()
 	try:
@@ -151,8 +159,10 @@ def enc(word,word_eol,userdata):
 			info(ctxt)
 		elif arg == "debug":
 			debug(ctxt)
+		else:
+			raise Exception
 	except Exception:
-		pass
+		help(ctxt)
 	return hexchat.EAT_ALL
 
 """ Initialization function """
