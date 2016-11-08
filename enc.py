@@ -5,6 +5,7 @@
 import hexchat
 import subprocess
 import os
+import ConfigParser
 
 __module_name__ = "hexchat-encrypt" 
 __module_version__ = "1.0" 
@@ -106,9 +107,17 @@ def debug(ctxt):
 		ctxt.prnt("Debug enabled")
 	return hexchat.EAT_ALL
 
+def readConf(section,option):
+	confFilePath = hexchat.get_info('configdir') + '/enc.conf'
+	if not os.path.isfile(confFilePath): 
+		raise Exception(confFilePath + " not found!")
+	config = ConfigParser.ConfigParser()
+	config.read(confFilePath)
+	return config.get(section,option)
+
 def enc(word,word_eol,userdata):
 	ctxt = hexchat.get_context()
-	if len(word) > 1:
+	try:
 		arg = word[1]
 		if arg == "enable":
 			enable(ctxt)
@@ -119,21 +128,26 @@ def enc(word,word_eol,userdata):
 		elif arg == "debug":
 			debug(ctxt)
 		else:
-			ctxt.prnt("Wrong argument")
-		return hexchat.EAT_ALL
+			raise IndexError
+	except IndexError:
+		ctxt.prnt(COLORS['RED'] + 'Wrong argument')
+	return hexchat.EAT_ALL
 
 def init():
-	filepath = hexchat.get_info('configdir') + "/pass.key"
-	if os.path.isfile(filepath):
-		global PASSFILE
-		PASSFILE = filepath
-		hexchat.prnt(COLORS['GREEN'] + PASSFILE + " loaded!")
-		hexchat.hook_command('', send)
-		hexchat.hook_command('enc',enc)
-		hexchat.hook_print('Private Message to Dialog', receive)	
-	else:
-		hexchat.prnt(COLORS['RED'] + "No password file found! Add " + 
-			filepath + " and reload script")
+	try:
+		filepath = readConf('PASSFILE','path')
+		if os.path.isfile(filepath):
+			global PASSFILE
+			PASSFILE = filepath
+			hexchat.prnt(COLORS['GREEN'] + PASSFILE + " loaded!")
+			hexchat.hook_command('', send)
+			hexchat.hook_command('enc',enc)
+			hexchat.hook_print('Private Message to Dialog', receive)	
+		else:
+			raise Exception("No password file found! Add correct path " + 
+				"to configfile and reload script")
+	except Exception as e:
+		hexchat.prnt(COLORS['RED'] + str(e))	
 
 init()
 
