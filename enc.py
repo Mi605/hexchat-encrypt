@@ -22,16 +22,13 @@ def channelServer(ctxt):
 	return (ctxt.get_info('channel'), ctxt.get_info('server'))
 
 """ Return 'message' as green text """
-def textPos(message):
-	return "\x0303" + message
+def textPos(message): return "\x0303" + message
 
 """ Return 'message' as red text """
-def textNeg(message):
-	return "\x0304" + message
+def textNeg(message): return "\x0304" + message
 
 """ Return 'message' as bold text """
-def textBold(message):
-	return "\002" + message
+def textBold(message): return "\002" + message
 
 """ Encrypt 'plaintext' through the openssl command line client """
 def encrypt(plaintext):
