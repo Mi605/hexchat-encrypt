@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # https://hexchat.readthedocs.io/en/latest/script_python.html
 
@@ -11,15 +11,21 @@ __module_name__ = "hexchat-encrypt"
 __module_version__ = "1.0" 
 __module_description__ = "hexchat symmetric encryption" 
 
+COLORS = { 'GREEN': "\x0303", 'RED': "\x0304" }
 PROCESSING = False
 PASSFILE = None
 CHANNELS = set()
-COLORS = { 'GREEN': "\x0303", 'RED': "\x0304" }
 DEBUG = False
 MCHARSIZE = 330
 			
 def channelServer(ctxt):
 	return (ctxt.get_info('channel'), ctxt.get_info('server'))
+
+def textPos(message):
+	return COLORS['GREEN'] + message
+
+def textNeg(message):
+	return COLORS['RED'] + message
 
 def encrypt(plaintext):
 	process = subprocess.Popen(
@@ -47,11 +53,10 @@ def send(word, word_eol, userdata):
 					(ctxt.get_info('channel'), "HEXCHATENC:" 
 						+ encrypt(message[x:x+MCHARSIZE])))
 			hexchat.emit_print('Your Message', 
-				hexchat.get_info('nick'), COLORS['GREEN'] + message)
+				hexchat.get_info('nick'), textPos(message))
 			return hexchat.EAT_HEXCHAT
 		except Exception as e:
-			ctxt.prnt(COLORS['RED'] + 
-				"Could not encrypt!")
+			ctxt.prnt(textNeg("Could not encrypt!"))
 			if DEBUG: ctxt.prnt(str(e))
 			return hexchat.EAT_ALL
 	return hexchat.EAT_NONE
@@ -67,34 +72,31 @@ def receive(word, word_eol, userdata):
 			plaintext = decrypt(message[11:])
 			PROCESSING = True
 			ctxt.emit_print('Private Message to Dialog', 
-				sender, COLORS['GREEN'] + plaintext)
+				sender, textPos(plaintext))
 			PROCESSING = False
 			return hexchat.EAT_HEXCHAT
 		except Exception as e:
-			ctxt.prnt(COLORS['RED'] + 
-				"Could not decrypt!")
+			ctxt.prnt(textNeg("Could not decrypt!"))
 			if DEBUG: ctxt.prnt(str(e))
 			return hexchat.EAT_NONE
 	return hexchat.EAT_NONE
 			
 def info(ctxt):
 	if channelServer(ctxt) in CHANNELS:
-		ctxt.prnt(COLORS['GREEN'] + 
-		"Outgoing encryption enabled for this channel")
+		ctxt.prnt(textPos("Outgoing encryption enabled"))
 	else:
-		ctxt.prnt(COLORS['RED'] + 
-		"Outgoing encryption disabled for this channel")
+		ctxt.prnt(textNeg("Outgoing encryption disabled"))
 	return hexchat.EAT_ALL
 
 def enable(ctxt):
 	CHANNELS.add(channelServer(ctxt))
-	ctxt.prnt(COLORS['GREEN'] + "Encryption enabled")
+	ctxt.prnt(textPos("Encryption enabled"))
 	return hexchat.EAT_ALL
 
 def disable(ctxt):
 	if channelServer(ctxt) in CHANNELS:
 		CHANNELS.remove(channelServer(ctxt))
-		ctxt.prnt(COLORS['RED'] + "Encryption disabled")
+		ctxt.prnt(textNeg("Encryption disabled"))
 	return hexchat.EAT_ALL
 
 def debug(ctxt):
@@ -110,7 +112,7 @@ def debug(ctxt):
 def readConf(section,option):
 	confFilePath = hexchat.get_info('configdir') + '/enc.conf'
 	if not os.path.isfile(confFilePath): 
-		raise Exception(confFilePath + " not found!")
+		raise IOError(confFilePath)
 	config = ConfigParser.ConfigParser()
 	config.read(confFilePath)
 	return config.get(section,option)
@@ -127,10 +129,8 @@ def enc(word,word_eol,userdata):
 			info(ctxt)
 		elif arg == "debug":
 			debug(ctxt)
-		else:
-			raise IndexError
-	except IndexError:
-		ctxt.prnt(COLORS['RED'] + 'Wrong argument')
+	except Exception:
+		pass
 	return hexchat.EAT_ALL
 
 def init():
@@ -139,15 +139,16 @@ def init():
 		if os.path.isfile(filepath):
 			global PASSFILE
 			PASSFILE = filepath
-			hexchat.prnt(COLORS['GREEN'] + PASSFILE + " loaded!")
+			hexchat.prnt(textPos(PASSFILE + " loaded!"))
 			hexchat.hook_command('', send)
 			hexchat.hook_command('enc',enc)
 			hexchat.hook_print('Private Message to Dialog', receive)	
 		else:
-			raise Exception("No password file found! Add correct path " + 
-				"to configfile and reload script")
+			raise IOError(filepath)
+	except IOError as e:
+		hexchat.prnt(textNeg(str(e) + " could not be opened"))
 	except Exception as e:
-		hexchat.prnt(COLORS['RED'] + str(e))	
+		hexchat.prnt(textNeg(str(e)))	
 
 init()
 
