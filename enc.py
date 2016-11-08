@@ -109,6 +109,13 @@ def info(ctxt):
 		ctxt.prnt("* Outgoing encryption disabled")
 	return hexchat.EAT_ALL
 
+def help(ctxt):
+	ctxt.prnt(textBold("------------ Help ------------"))
+	ctxt.prnt(textBold("/enc enable   Enable outgoing encryption for current context"))
+	ctxt.prnt(textBold("/enc disable  Disable outgoing encryption for current context"))
+	ctxt.prnt(textBold("/enc debug    Toggle verbose error messages"))
+	ctxt.prnt(textBold("/enc info     Print status about debug/encryption"))
+
 """ Enable outgoing encryption for current channel """
 def enable(ctxt):
 	CHANNELS.add(channelServer(ctxt))
@@ -138,14 +145,6 @@ def readConf(section,option):
 	config = ConfigParser.ConfigParser()
 	config.read(confFilePath)
 	return config.get(section,option)
-
-def help(ctxt):
-	ctxt.prnt(textBold("------------ Help ------------"))
-	ctxt.prnt(textBold("/enc enable   Enable outgoing encryption for current context"))
-	ctxt.prnt(textBold("/enc disable  Disable outgoing encryption for current context"))
-	ctxt.prnt(textBold("/enc debug    Toggle verbose error messages"))
-	ctxt.prnt(textBold("/enc info     Print status about debug/encryption"))
-
 
 def enc(word,word_eol,userdata):
 	ctxt = hexchat.get_context()
