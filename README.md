@@ -5,3 +5,6 @@ The goal with this experiment/project was to as simple and slim as possible with
 In the script change:
 </br>
 <code>PASSFILE = "/path/to/password/file"</code>
+</br>
+Load the script:
+<code>/py load <i>path-to-script</i></code>
