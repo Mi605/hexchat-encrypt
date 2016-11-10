@@ -7,7 +7,7 @@ import subprocess
 import os
 
 __module_name__ = "hexchat-encrypt" 
-__module_version__ = "1.0" 
+__module_version__ = "1.0.0" 
 __module_description__ = "hexchat symmetric encryption" 
 
 PROCESSING = False
@@ -15,19 +15,6 @@ PASSFILE = "/home/user/pass.key" # Path to key
 CHANNELS = set()
 DEBUG = False
 MCHARSIZE = 330
-
-""" Return channel and servername from the specified context """
-def channelServer(ctxt):
-	return (ctxt.get_info('channel'), ctxt.get_info('server'))
-
-""" Return 'message' as green text """
-def textPos(message): return "\x0303" + message
-
-""" Return 'message' as red text """
-def textNeg(message): return "\x0304" + message
-
-""" Return 'message' as bold text """
-def textBold(message): return "\002" + message
 
 """ Encrypt 'plaintext' through the openssl command line client """
 def encrypt(plaintext):
@@ -64,7 +51,7 @@ def send(word, word_eol, userdata):
 				hexchat.command('PRIVMSG %s :%s' % 
 					(ctxt.get_info('channel'), "HEXCHATENC:" 
 						+ encrypt(message[x:x+MCHARSIZE])))
-
+			""" Message sent, print to dialog window"""
 			hexchat.emit_print('Your Message', 
 				hexchat.get_info('nick'), textPos(message))
 			return hexchat.EAT_HEXCHAT
@@ -81,12 +68,13 @@ def receive(word, word_eol, userdata):
 		return hexchat.EAT_NONE
 	sender,message = word[0],word[1]
 	ctxt = hexchat.get_context()
-	""" If the first characters of the received message 
+	""" If the first 11 characters of the received message 
 	is the word 'HEXCHATENC:' the text is probably encrypted """
 	if message[:11] == "HEXCHATENC:":
 		try:
 			plaintext = decrypt(message[11:])
 			PROCESSING = True
+			""" Message decrypted, print to dialog window"""
 			ctxt.emit_print('Private Message to Dialog', 
 				sender, textPos(plaintext))
 			PROCESSING = False
@@ -96,25 +84,6 @@ def receive(word, word_eol, userdata):
 			if DEBUG: ctxt.prnt(str(e))
 			return hexchat.EAT_NONE
 	return hexchat.EAT_NONE
-
-""" Print info about encryption/debug/passfile """
-def info(ctxt):
-	ctxt.prnt(textBold("------------ Info ------------"))
-	ctxt.prnt("* Passfile: " + PASSFILE )
-	ctxt.prnt("* Debug enabled" if DEBUG else "* Debug disabled")
-	if channelServer(ctxt) in CHANNELS:
-		ctxt.prnt("* Encryption enabled")
-	else:
-		ctxt.prnt("* Encryption disabled")
-	return hexchat.EAT_ALL
-
-""" Print help summary """
-def help(ctxt):
-	ctxt.prnt(textBold("------------ Help ------------"))
-	ctxt.prnt(textBold("/enc enable   - Enable encryption for current context"))
-	ctxt.prnt(textBold("/enc disable  - Disable encryption for current context"))
-	ctxt.prnt(textBold("/enc debug    - Toggle verbose error messages"))
-	ctxt.prnt(textBold("/enc info     - Print status about debug/encryption"))
 
 """ Enable outgoing encryption for current channel """
 def enable(ctxt):
@@ -133,8 +102,6 @@ def disable(ctxt):
 def debug(ctxt):
 	global DEBUG
 	DEBUG = DEBUG ^ 1
-	ctxt.prnt("Debug enabled" 
-		if DEBUG else "Debug disabled")
 	return hexchat.EAT_ALL
 
 def enc(word,word_eol,userdata):
@@ -155,12 +122,44 @@ def enc(word,word_eol,userdata):
 		help(ctxt)
 	return hexchat.EAT_ALL
 
+""" Return channel and servername from the specified context """
+def channelServer(ctxt):
+	return (ctxt.get_info('channel'), ctxt.get_info('server'))
+
+""" Return 'message' as green text """
+def textPos(message): return "\x0303" + message
+
+""" Return 'message' as red text """
+def textNeg(message): return "\x0304" + message
+
+""" Return 'message' as bold text """
+def textBold(message): return "\002"  + message
+
+""" Print info about encryption/debug/passfile """
+def info(ctxt):
+	ctxt.prnt(textBold("------------------ Info ------------------"))
+	ctxt.prnt("* Passfile: " + PASSFILE )
+	ctxt.prnt("* Debug enabled" if DEBUG else "* Debug disabled")
+	if channelServer(ctxt) in CHANNELS:
+		ctxt.prnt("* Encryption enabled")
+	else:
+		ctxt.prnt("* Encryption disabled")
+	return hexchat.EAT_ALL
+
+""" Print help summary """
+def help(ctxt):
+	ctxt.prnt(textBold("------------------ Help ------------------"))
+	ctxt.prnt(textBold("/enc enable   - Enable encryption for current dialog"))
+	ctxt.prnt(textBold("/enc disable  - Disable encryption for current dialog"))
+	ctxt.prnt(textBold("/enc info     - Print status about debug/encryption"))
+	return hexchat.EAT_ALL
+
 def init():
 	try:
 		if os.path.isfile(PASSFILE):
 			hexchat.prnt(textPos(PASSFILE + " loaded! Decryption of incoming messages enabled."))
 			hexchat.hook_command('', send)
-			hexchat.hook_command('enc', enc,help="For help use the command /enc help")
+			hexchat.hook_command('enc', enc,help="For help use the command /enc")
 			hexchat.hook_print('Private Message to Dialog', receive)	
 		else:
 			hexchat.prnt(textNeg("Could not open passfile"))
