@@ -1,3 +1,5 @@
-Simple symmetric encryption script to be used with the Hexchat IRC client.
+<b>Simple symmetric encryption script to be used with the Hexchat IRC client.</b>
 
-The goal with this project was to as simple as possible add symmetric encryption between two or more IRC users who shares a common password file. To avoid using external python libraries the script uses the openssl-commandline-client for encryption and decryption.
+The goal with this project was to as simple and slim as possible with only one file add symmetric encryption between two or more IRC users. To keep it simple without the need of installing external python libraries the script uses the openssl-commandline-client (https://wiki.openssl.org/index.php/Manual:Enc(1)) for encryption and decryption using 256 bit AES-CBC encryption. 
+
+PASSFILE = "/path/to/password/file"
