@@ -4,4 +4,4 @@ The goal with this experiment/project was to as simple and slim as possible with
 
 In the script change:
 </br>
-<i>PASSFILE = "/path/to/password/file"</i>
+<code>PASSFILE = "/path/to/password/file"</code>
