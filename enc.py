@@ -35,7 +35,7 @@ __module_version__ = "1.0.0"
 __module_description__ = "hexchat symmetric encryption" 
 
 PROCESSING = False
-PASSFILE = "/home/user/pass.key" # Path to key 
+PASSFILE = "/home/user/pass.key" # Path to passwordfile 
 DIALOGS = set()
 DEBUG = False
 MCHARSIZE = 330
