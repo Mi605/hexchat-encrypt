@@ -164,9 +164,9 @@ def info(ctxt):
 """ Print help summary """
 def help(ctxt):
 	ctxt.prnt(textBold("------------------ Help ------------------"))
-	ctxt.prnt(textBold("/enc enable   - Encrypt outgoing messages on current dialog window"))
-	ctxt.prnt(textBold("/enc disable  - Disable encryption of outgoing messages on current dialog window"))
-	ctxt.prnt(textBold("/enc info     - Print status about debug/encryption"))
+	ctxt.prnt("/enc enable   - Encrypt outgoing messages on current dialog window")
+	ctxt.prnt("/enc disable  - Disable encryption of outgoing messages on current dialog window")
+	ctxt.prnt("/enc info     - Print status about debug/encryption")
 	return hexchat.EAT_ALL
 
 """ Handles all /enc command arguments"""
