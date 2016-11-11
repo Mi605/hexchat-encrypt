@@ -106,7 +106,6 @@ def receive(word, word_eol, userdata):
 		except Exception as e:
 			ctxt.prnt(textNeg("Could not decrypt!"))
 			if DEBUG: ctxt.prnt(str(e))
-			return hexchat.EAT_NONE
 	return hexchat.EAT_NONE
 
 """ Enable outgoing encryption for current channel """
