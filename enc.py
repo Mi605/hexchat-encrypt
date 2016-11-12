@@ -64,8 +64,8 @@ def send(word, word_eol, userdata):
 	""" Only encrypt outgoing message if channel/server 
 	is added to DIALOGS list """
 	if channelServer(ctxt) in DIALOGS: 
-		message = word_eol[0]
 		try:
+			message = word_eol[0]
 			""" To avoid the encrypted text gets cut off during transmission
 			encrypt and send the message in chunks of MCHARSIZE character-
 			length . """
