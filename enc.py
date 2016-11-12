@@ -87,7 +87,6 @@ def send(word, word_eol, userdata):
 
 """ Invoked every time a message is received in a private dialog """
 def receive(word, word_eol, userdata):
-
 	global PROCESSING
 	if PROCESSING:
 		return hexchat.EAT_NONE
