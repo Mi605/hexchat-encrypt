@@ -97,7 +97,8 @@ def receive(word, word_eol, userdata):
 	is the word 'HEXCHATENC:' the text is probably encrypted """
 	if message[:11] == "HEXCHATENC:":
 		try:
-			""" If sender not in DIALOGS -> add"""
+			""" If sender not in DIALOGS -> add
+			(Enable outgoing encryption of current context) """
 			if channelServer(ctxt) not in DIALOGS:
 				enable(ctxt)
 			plaintext = decrypt(message[11:])
