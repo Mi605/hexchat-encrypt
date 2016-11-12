@@ -70,8 +70,8 @@ def send(word, word_eol, userdata):
 			encrypt and send the message in chunks of MCHARSIZE character-
 			length . """
 			for x in range(0,len(message),MCHARSIZE): 
-				""" To mark the message as encrypted, 'HEXCHATENC:' is concatenated
-				to the encrypted message. """
+				""" To mark the message as encrypted, 'HEXCHATENC:' is 
+				concatenated to the encrypted message. """
 				hexchat.command('PRIVMSG %s :%s' % 
 					(ctxt.get_info('channel'), "HEXCHATENC:" 
 						+ encrypt(message[x:x+MCHARSIZE])))
@@ -97,8 +97,8 @@ def receive(word, word_eol, userdata):
 	if message[:11] == "HEXCHATENC:":
 		try:
 			plaintext = decrypt(message[11:])
-			""" If sender not in DIALOGS -> add
-			(Enable outgoing encryption of current context) """
+			""" If sender not in DIALOGS -> enable outgoing 
+			encryption for this context """
 			if channelServer(ctxt) not in DIALOGS:
 				enable(ctxt)
 
@@ -148,13 +148,16 @@ def isDialog(ctxt):
 		if x.channel == ctxt.get_info('channel')][0] == 3
 
 """ Return 'message' as green text """
-def textPos(message): return "\x0303" + message
+def textPos(message): 
+	return "\x0303" + message
 
 """ Return 'message' as red text """
-def textNeg(message): return "\x0304" + message
+def textNeg(message): 
+	return "\x0304" + message
 
 """ Return 'message' as bold text """
-def textBold(message): return "\002"  + message
+def textBold(message): 
+	return "\002"  + message
 
 """ Handles all /enc command arguments"""
 def enc(word,word_eol,userdata):
@@ -181,7 +184,7 @@ def init():
 		if os.path.isfile(PASSFILE):
 			hexchat.prnt(textPos(PASSFILE + " loaded!"))
 			hexchat.hook_command('', send)
-			hexchat.hook_command('enc', enc,help="For help use the command /enc")
+			hexchat.hook_command('enc', enc, help="For help use the command /enc")
 			hexchat.hook_print('Private Message to Dialog', receive)	
 		else:
 			hexchat.prnt(textNeg("Could not open passfile"))
