@@ -9,7 +9,7 @@ Place <i>enc.py</i> in ~/.config/hexchat/addons. Create a passwordfile where the
 
 <b>How to use:</b>
 
-Enable outgoing encryption in a private dialog window with the command: <i>/enc enable</i>. When a encrypted message is received encryption/decryption is automatically enabled. Text changes to green.
+Enable outgoing encryption in a private dialog window with the command: <i>/enc enable</i>. When an encrypted message is received encryption/decryption is automatically enabled. Text changes to green.
 
 <i>/enc enable   - Encrypt outgoing messages on current dialog window </i><br>
 <i>/enc disable  - Disable encryption of outgoing messages on current dialog window</i> <br>
