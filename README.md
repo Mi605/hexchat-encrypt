@@ -15,4 +15,4 @@ Enable outgoing encryption in a private dialog window with the command: <i>/enc 
 <i>/enc disable  - Disable encryption of outgoing messages on current dialog window</i> <br>
 <i>/enc info     - Print status about debug/encryption</i>
 
-Information: http://hexchat.readthedocs.io/en/latest/script_python.html#autoloading-modules
+HexChat Python Interface: http://hexchat.readthedocs.io/en/latest/script_python.html#autoloading-modules
