@@ -113,7 +113,7 @@ def receive(word, word_eol, userdata):
 			if DEBUG: ctxt.prnt(str(e))
 	return hexchat.EAT_NONE
 
-""" Enable outgoing encryption for current channel """
+""" Enable outgoing encryption on current channel """
 def enable(ctxt):
 	if isDialog(ctxt):
 		DIALOGS.add(channelServer(ctxt))
@@ -123,7 +123,7 @@ def enable(ctxt):
 			" on private dialog windows"))
 	return hexchat.EAT_ALL
 
-""" Disable outgoing encryption for current channel """
+""" Disable outgoing encryption on current channel """
 def disable(ctxt):
 	if channelServer(ctxt) in DIALOGS:
 		DIALOGS.remove(channelServer(ctxt))
