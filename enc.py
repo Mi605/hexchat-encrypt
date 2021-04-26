@@ -43,7 +43,7 @@ MCHARSIZE = 330
 """ Encrypt 'plaintext' through the openssl command line client """
 def encrypt(plaintext):
 	process = subprocess.Popen(
-		["openssl","enc","-aes-256-cbc","-e","-salt","-a","-A","-pass","file:" + PASSFILE],
+		["openssl","enc","-aes-256-cbc","-iter","5000","-e","-salt","-a","-A","-pass","file:" + PASSFILE],
 		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = process.communicate(plaintext)      
 	if process.returncode == 0: return stdout # Return as base64
@@ -52,7 +52,7 @@ def encrypt(plaintext):
 """ Decrypt 'cryptogram' through the openssl command line client """
 def decrypt(cryptogram):
 	process = subprocess.Popen(
-		["openssl","enc","-aes-256-cbc","-d","-salt","-a","-A","-pass","file:" + PASSFILE],
+		["openssl","enc","-aes-256-cbc","-iter","5000","-d","-salt","-a","-A","-pass","file:" + PASSFILE],
 		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = process.communicate(cryptogram)
 	if process.returncode == 0: return stdout
